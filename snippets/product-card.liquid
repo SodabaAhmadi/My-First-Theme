@@ -1,0 +1,275 @@
+<style>
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    [x-cloak] {
+  display: none !important;
+}
+
+</style>
+
+<div data-title="{{ product.title }}" data-price="{{ product.price | divided_by: 100.0 }}">
+<a href="{{ product.url }}">
+
+    <div 
+      x-data="productSlider(
+        [{% for image in product.images %}'{{ image | image_url: width: 400 }}'{% unless forloop.last %}, {% endunless %}{% endfor %}],
+        [{% for image in product.images %}'{{ image | image_url: width: 800 }}'{% unless forloop.last %}, {% endunless %}{% endfor %}]
+      )"
+      class="w-full"
+      :class="grid === 12 ? 'max-w-[100px]' : 'max-w-[260px]'"
+    >
+       <!-- Image slider -->
+        <div class="relative overflow-hidden bg-gray-100 group"
+             :class="grid === 12 ? 'h-[120px]' : 'h-[360px]'"> <!-- dynamic height -->
+             
+            <!-- SOLD OUT Badge -->
+            {% unless product.available %}
+            <div class="absolute top-2 right-2 bg-white rounded-full shadow px-2 py-1 z-30 text-[10px] md:text-xs">
+                <span class="text-gray-700 font-medium">Sold Out</span>
+            </div>
+            {% endunless %}
+          
+            <!-- Image wrapper -->
+             <div class="flex h-full"
+                 :class="transitioning ? 'transition-transform duration-500 ease-in-out' : ''"
+                 :style="`transform: translateX(-${activeImage * (100 / (images.length + 2))}%); width: ${(images.length + 2) * 100}%`"
+                 @transitionend="handleTransitionEnd">
+
+
+                  <!-- Clone of last image -->
+                <div class="w-full flex-shrink-0 h-full" :style="`width: ${100 / (images.length + 2)}%`">
+                    <img :src="images[images.length - 1]" alt="" class="w-full h-full object-cover" />
+                </div>
+    
+                <!-- Real product images -->
+                <template x-for="(image, index) in images" :key="index">
+                    <div class="w-full flex-shrink-0 h-full" :style="`width: ${100 / (images.length + 2)}%`">
+                        <img :src="image" alt="Product image" class="w-full h-full object-cover" />
+                    </div>
+                </template>
+    
+                <!-- Clone of first image -->
+                <div class="w-full flex-shrink-0 h-full" :style="`width: ${100 / (images.length + 2)}%`">
+                    <img :src="images[0]" alt="" class="w-full h-full object-cover" />
+                </div>
+            </div>
+    
+            <!-- Prev Button -->
+            <button @click="prev()"
+                class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full cursor-pointer p-2 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
+                aria-label="Previous">
+                {% render 'icon-arrow', class: 'rotate-180' %}
+            </button>
+    
+            <!-- Next Button -->
+            <button @click="next()"
+                class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full cursor-pointer   p-2 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
+                aria-label="Next">
+                {% render 'icon-arrow' %}
+            </button>
+    
+    
+    
+            <!-- Add to Cart Button (opens modal) -->
+            {% if product.available %}
+            <div class="absolute bottom-2 right-2 z-20 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
+                <button @click="showModal = true" type="button"
+                    class="bg-white rounded-full cursor-pointer  shadow transition-all duration-300 ease-in-out group h-8 w-8 hover:w-[64px] overflow-hidden flex items-center justify-start pl-2">
+                    <!-- Cart Icon -->
+                    {% render 'icon-cart', class: "w-4 h-4 text-gray-700 flex-shrink-0" %}
+    
+                    <span
+                        class="ml-2 text-gray-700 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                        Add
+                    </span>
+                </button>
+            </div>
+            {% endif %}
+    
+        </div>
+    
+         <!-- Product title + price -->
+        <div class="mt-2 " :class="grid === 12 ? 'text-[10px]' : 'text-sm'">
+            <a href="{{ product.url }}" class="block truncate">{{ product.title }}</a>
+            <p class="font-medium mt-1" :class="grid === 12 ? 'text-[10px]' : 'text-sm'">
+              {{ product.price | money }}
+            </p>
+        </div>
+    
+        <!-- Modal -->
+        <div x-show="showModal"   x-cloak  class="fixed  inset-0 z-50 flex items-center justify-center bg-gray-900/40 "
+            @click.self="showModal = false" x-transition>
+    
+            <!-- Modal container -->
+            <div class="bg-white w-full max-w-2xl h-[85vh] rounded-lg overflow-hidden flex relative">
+    
+                <!-- Close button -->
+                <button @click="showModal = false" class="absolute top-3 right-3  p-2 rounded-full z-10">
+                    {%- render 'icon-close' -%}
+                </button>
+    
+                <!-- Left column: product images -->
+                <div class="w-1/2 h-full overflow-y-auto rounded-tr-[16px]  scrollbar-hide">
+                    <template x-for="(image, index) in modalImages" :key="index">
+                        <img :src="image" alt="Product image" class="w-full h-auto block pb-1" />
+                    </template>
+                </div>
+    
+                <!-- Right column: product details -->
+                <div class="w-1/2 h-full flex flex-col">
+                    <!-- Title + Price -->
+                    <div class="p-6 pb-2">
+                        <h2 class="text-2xl font-bold mb-2">
+                            {{ product.title }}
+                        </h2>
+                        <p class="text-lg mt-10 mb-4">{{product.price | money}}</p>
+                    </div>
+    
+                    <!-- Color + Size (scrollable area) -->
+                    <div class="px-6 flex-1 mt-4">
+                        <div class="max-h-28 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300">
+    
+                            <!-- Colors -->
+                            {% if product.variants.size > 1 %}
+                            {% assign color_option = product.options_with_values | where: 'name', 'Color' | first %}
+                            {% if color_option %}
+                            <div class="mb-4" x-data="{
+               selectedColor: '{{ color_option.values.first }}'
+             }">
+                                <p class="text-sm font-medium mb-2">
+                                    Color <span x-text="' ' + selectedColor"></span>
+                                </p>
+    
+                                <div class="flex gap-2 flex-wrap px-2">
+                                    {% for value in color_option.values %}
+                                    <span @click="selectedColor = '{{ value }}'"
+                                        class="w-10 h-10 rounded-full cursor-pointer border-2 border-amber-50 transition hover:ring-2 hover:ring-gray-300 hover:border-white"
+                                        style="background-color: {{ value | downcase }};"
+                                        :class="selectedColor === '{{ value }}' ? 'ring-2 ring-gray-500 border-white' : ''">
+                                    </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+    
+    
+    
+    
+                            <!-- Sizes -->
+                            {% assign size_option = product.options_with_values | where: "name", "Size" | first %}
+    
+                            {% if size_option %}
+                            <div x-data="{ selectedSize: '{{ size_option.values.first }}' }">
+                                <p class="text-sm font-medium mb-2">Size</p>
+                                <div class="flex gap-2 flex-wrap">
+                                    {% for value in size_option.values %}
+                                    <button @click="selectedSize = '{{ value }}'" :class="selectedSize === '{{ value }}'
+                ? 'bg-black text-white border-gray-300' 
+                : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-500'"
+                                        class="px-4 py-2 rounded-[16px] transition min-w-[54px] text-center">
+                                        <span>{{ value }}</span>
+                                    </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+    
+    
+                        </div>
+                    </div>
+    
+                    <!-- Bottom actions -->
+                    <div class="p-6  space-y-4 bg-white">
+                        <!-- Quantity + Add to cart -->
+                        <div class="flex space-x-2">
+                            <div class="flex items-center border border-gray-300 rounded-lg px-3 py-3 space-x-7">
+                                <button class="text-gray-600" @click="if(quantity > 1) quantity--">−</button>
+                                <span x-text="quantity"></span>
+                                <button class="text-gray-600" @click="quantity++">+</button>
+                            </div>
+    
+                            <button
+                                class="flex-1 bg-black text-white py-3 rounded-lg flex items-center justify-center space-x-2">
+                                {% render 'icon-cart' class:"w-5 h-5" %}
+                                <span>Add to cart</span>
+                            </button>
+    
+                        </div>
+    
+                        <!-- Shop Pay -->
+                        <button class="w-full bg-[#5a31f4] text-white py-3 rounded-lg font-medium">
+                            Buy with <span class="font-bold">Shop</span>
+                            <span class="bg-white text-[#5a31f4] px-1 rounded">Pay</span>
+                        </button>
+    
+                        <p class="text-sm text-center underline cursor-pointer">More payment options</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    
+    
+    
+    
+    </div>
+</a>
+</div>
+
+
+<script>
+
+    
+
+    // assets/product-slider.js
+document.addEventListener("alpine:init", () => {
+  Alpine.data("productSlider", (images, modalImages) => ({
+    activeImage: 1,
+    images: images,
+    transitioning: true,
+    originalImage: 1,
+
+    // Modal state
+    showModal: false,
+    modalImages: modalImages,
+    quantity: 1,
+    selectedColor: null,
+    selectedSize: null,
+
+    showNext() {
+      this.originalImage = this.activeImage;
+      this.next();
+    },
+    resetImage() {
+      this.activeImage = this.originalImage;
+    },
+    next() {
+      this.transitioning = true;
+      this.activeImage++;
+    },
+    prev() {
+      this.transitioning = true;
+      this.activeImage--;
+    },
+    handleTransitionEnd() {
+      if (this.activeImage === this.images.length + 1) {
+        this.transitioning = false;
+        this.activeImage = 1;
+      }
+      if (this.activeImage === 0) {
+        this.transitioning = false;
+        this.activeImage = this.images.length;
+      }
+    }
+  }));
+});
+
+
+</script>

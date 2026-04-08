@@ -1,0 +1,307 @@
+{% paginate collection.products by 12 %}
+<section class="px-6 py-10" x-data="gridToggle()">
+  <h1 class="text-3xl font-bold mb-6">{{ collection.title }}</h1>
+
+  <!-- Filters -->
+  <div class="flex justify-between items-center mb-6 text-sm text-gray-700">
+    <div class="flex space-x-6">
+      <!-- Availability Dropdown -->
+      <div class="relative group" x-data="{ open: false }" @click.outside="open = false">
+        <button @click="open = !open" class="flex items-center space-x-1">
+          <span>Availability</span>
+          <span :class="open ? 'transition-transform rotate-180' : ''">
+            {% render 'icon-dropdown', class: 'w-4 h-4 transition-transform' %}
+          </span>
+        </button>
+        <div
+          class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 transition-all duration-200 ease-out origin-top"
+          x-show="open" x-transition style="display: none">
+          <div class="px-4 py-2 border-b border-gray-100 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Availability
+          </div>
+          <label class="flex items-center px-4 py-2 hover:bg-custom-gray cursor-pointer">
+            <input type="checkbox" class="rounded border-gray-300 text-black focus:ring-black mr-2"
+              @change="toggleAvailability('in')" :checked="availability.includes('in')" />
+            <span class="text-sm">In stock</span>
+          </label>
+
+          <label class="flex items-center px-4 py-2 hover:bg-custom-gray cursor-pointer">
+            <input type="checkbox" class="rounded border-gray-300 text-black focus:ring-black mr-2"
+              @change="toggleAvailability('out')" :checked="availability.includes('out')" />
+            <span class="text-sm">Out of stock</span>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- Color Dropdown -->
+      <div class="relative" x-data="{ open: false, selectedColors: [], colors: [
+              
+             { name: 'Beige', value: '#e6d7a5' },
+             { name: 'Black', value: '#000000' },
+             { name: 'Blue', value: '#4b81a0' },
+             { name: 'Brown', value: '#9b552b' },
+             { name: 'Gray', value: '#7a7a7a' },
+             { name: 'Dark Green', value: '#2b4430' },
+             { name: 'Navy', value: '#1a1c38' },
+             { name: 'Light Gray', value: '#d7cfcf' },
+             { name: 'Purple', value: '#5a3b54' },
+             { name: 'Red', value: '#8b2e22' },
+             { name: 'White', value: '#ffffff', border: true },
+             { name: 'Khaki', value: '#a49870' }
+           ],
+           toggleColor(color) {
+             if (this.selectedColors.includes(color.name)) {
+               this.selectedColors = this.selectedColors.filter(c => c !== color.name)
+             } else {
+               this.selectedColors.push(color.name)
+             }
+           },
+           clearAll() { this.selectedColors = [] }
+         }" @click.outside="open = false">
+
+        <div class="flex items-center space-x-2">
+          <button class="flex items-center focus:outline-none" @click="open = !open">
+            <span>Color</span>
+            <!-- Selected color circles -->
+            <div class="flex items-center ml-2">
+              <template x-for="color in colors.filter(c => selectedColors.includes(c.name))" :key="color.name">
+                <div class="w-4 h-4 rounded-full border -mr-[8px]"
+                  :style="`background-color: ${color.value}; border-color: ${color.border ? '#ccc' : 'transparent'}`">
+                </div>
+              </template>
+            </div>
+            <i class="fas fa-chevron-down ml-2 text-xs transition-transform duration-200"
+              :class="{'rotate-180': open}"></i>
+          </button>
+
+          <!-- Clear button -->
+          <template x-if="selectedColors.length > 0">
+            <button class="text-sm text-blue-600 hover:underline ml-2" @click="clearAll()">
+              Clear all
+            </button>
+          </template>
+        </div>
+
+        <!-- Dropdown -->
+        <div
+          class="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg p-4 z-10 transition-all duration-200 ease-out origin-top"
+          x-show="open" x-transition style="display: none">
+          <div class="grid grid-cols-4 gap-3">
+            <template x-for="color in colors" :key="color.name">
+              <div class="relative cursor-pointer" @click="toggleColor(color)">
+                <div class="w-8 h-8 rounded-full border flex items-center justify-center"
+                  :style="`background-color: ${color.value}; border-color: ${color.border ? '#ddd' : 'transparent'}`">
+                  <div x-show="selectedColors.includes(color.name)"
+                    class="absolute w-9 h-9 rounded-full border-2 border-black -m-0.5"></div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right section -->
+    <div class="flex space-x-6 items-center">
+      <span class="text-gray-500">{{ collection.products_count }} items</span>
+
+      <!-- Sort Dropdown -->
+      <!-- Sort Dropdown -->
+      <div class="relative group" x-data="{ open: false }" @click.outside="open = false">
+        <button class="flex items-center focus:outline-none" @click="open = !open">
+          Sort
+          <i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-200"
+            :class="{'rotate-180': open}"></i>
+        </button>
+
+        <div class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-2 z-10" x-show="open" x-transition
+          style="display: none">
+          <template x-for="option in [
+      'Featured',
+      'Best selling',
+      'Alphabetically, A-Z',
+      'Alphabetically, Z-A',
+      'Price, low to high',
+      'Price, high to low',
+      'Date, old to new',
+      'Date, new to old'
+    ]" :key="option">
+            <div class="flex items-center px-4 py-2 cursor-pointer hover:bg-gray-50"
+              @click="setSort(option); open = false">
+              <span class="w-4 h-4 mr-2 flex items-center justify-center">
+                <svg x-show="sortOption === option" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-black"
+                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
+              <span x-text="option"></span>
+            </div>
+          </template>
+        </div>
+      </div>
+
+
+
+      <!-- Grid Toggle -->
+      <div class="flex space-x-2">
+        <!-- 4 per row -->
+        <button @click="setGrid(4)" :class="grid === 4 ? 'bg-gray-200 border' : 'hover:bg-gray-200 border rounded'"
+          class="p-1 rounded">
+          <!-- Grid icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h4v4H4V6zm0 8h4v4H4v-4zm6-8h4v4h-4V6zm0 8h4v4h-4v-4zm6-8h4v4h-4V6zm0 8h4v4h-4v-4z" />
+          </svg>
+        </button>
+
+        <!-- 12 per row -->
+        <button @click="setGrid(12)" :class="grid === 12 ? 'bg-gray-200 border' : 'hover:bg-gray-200 border rounded'"
+          class="p-1 rounded">
+          <!-- 12-grid icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+
+  </div>
+
+
+
+
+  <!-- Product Grid -->
+  {% if collection.products_count > 0 %}
+  <div id="productGrid" class="grid gap-6"
+    :class="grid === 4 ? 'grid-cols-2 md:grid-cols-4' : 'grid-cols-2 md:grid-cols-12'">
+    {% for product in collection.products %}
+      {% assign color_option = product.options_with_values | where: "name", "Color" | first %}
+    <div class="product-item" x-show="filterProduct($el.dataset.available === 'true', JSON.parse($el.dataset.colors))"
+      data-available="{{ product.available }}"
+      data-colors='{{ color_option.values | json }}'
+>
+      {% render 'product-card', product: product %}
+    </div>
+
+    {% endfor %}
+  </div>
+  {% else %}
+  <p>No products found in this collection.</p>
+  {% endif %}
+
+  {% if paginate.pages > 1 %}
+  {{ paginate | default_pagination }}
+  {% endif %}
+</section>
+
+
+
+
+<!-- Alpine.js -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<!-- External Alpine Component -->
+<script>
+
+
+  function gridToggle() {
+    return {
+      grid: 4,
+
+      availability: [],       // ['in', 'out']
+      selectedColors: [],
+      sortOption: 'Alphabetically, A-Z',
+
+      setGrid(cols) {
+        this.grid = cols;
+      },
+
+      toggleAvailability(option) {
+        if (this.availability.includes(option)) {
+          this.availability = this.availability.filter(a => a !== option);
+        } else {
+          this.availability.push(option);
+        }
+      },
+
+      toggleColor(color) {
+        let normalized = color.name.trim().toLowerCase();
+        if (this.selectedColors.includes(normalized)) {
+          this.selectedColors = this.selectedColors.filter(c => c !== normalized);
+        } else {
+          this.selectedColors.push(normalized);
+        }
+      },
+
+
+
+
+      setSort(option) {
+        this.sortOption = option;
+        this.sortProducts();
+      },
+
+      filterProduct(inStock, productColors = []) {
+        let ok = true;
+
+        // Availability filter
+        if (this.availability.length) {
+          if (this.availability.includes('in') && !inStock) ok = false;
+          if (this.availability.includes('out') && inStock) ok = false;
+        }
+
+        // Color filter
+        if (this.selectedColors.length) {
+          let normalizedColors = productColors.map(c => c.trim().toLowerCase());
+          if (!this.selectedColors.some(c => normalizedColors.includes(c))) {
+            ok = false;
+          }
+        }
+
+        return ok;
+      },
+
+
+
+
+      sortProducts() {
+        let grid = document.getElementById('productGrid');
+        let items = Array.from(grid.children);
+
+        items.sort((a, b) => {
+          let nameA = a.querySelector('[data-title]')?.dataset.title || '';
+          let nameB = b.querySelector('[data-title]')?.dataset.title || '';
+          let priceA = parseFloat(a.querySelector('[data-price]')?.dataset.price || 0);
+          let priceB = parseFloat(b.querySelector('[data-price]')?.dataset.price || 0);
+
+          switch (this.sortOption) {
+            case 'Alphabetically, A-Z':
+              return nameA.localeCompare(nameB);
+            case 'Alphabetically, Z-A':
+              return nameB.localeCompare(nameA);
+            case 'Price, low to high':
+              return priceA - priceB;
+            case 'Price, high to low':
+              return priceB - priceA;
+            default:
+              return 0;
+          }
+        });
+
+        items.forEach(item => grid.appendChild(item));
+      }
+    }
+  }
+
+
+</script>
+{% endpaginate %}
+
+{% schema %}
+{
+  "name": "Collection template",
+  "settings": []
+}
+{% endschema %}

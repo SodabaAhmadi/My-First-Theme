@@ -1,0 +1,135 @@
+<!-- Hero Section -->
+
+<section class="relative">
+  {% if section.settings.hero_image != blank %}
+    <img 
+      src="{{ section.settings.hero_image | image_url: width: 2000 }}" 
+      alt="{{ section.settings.hero_image.alt | escape }}" 
+      class="w-full h-[400px] object-cover"
+    >
+  {% else %}
+    <img 
+      src="{{ 'hero-default.jpg' | asset_url }}" 
+      alt="Hero" 
+      class="w-full h-[400px] object-cover"
+    >
+  {% endif %}
+
+  <div class="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/30">
+    <h1 class="text-4xl md:text-6xl font-bold mb-4">{{ section.settings.hero_heading }}</h1>
+    {% if section.settings.hero_button_label != blank %}
+      <a href="{{ section.settings.hero_button_link }}" class="px-6 py-3 border border-white text-white rounded-lg hover:bg-white hover:text-black transition">
+        {{ section.settings.hero_button_label }}
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+
+<!-- Cart Drawer -->
+<div id="cartDrawer" class="fixed inset-0 hidden z-50">
+  <!-- Background overlay -->
+  <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeCart()"></div>
+
+  <!-- Drawer panel -->
+  <div id="cartPanel"
+    class="absolute right-0 top-0 h-full w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-300">
+    <!-- Close button -->
+    <button onclick="closeCart()" class="absolute top-4 right-4 text-gray-600 hover:text-black">
+      <i class="fas fa-times text-xl"></i>
+    </button>
+
+    <!-- Empty cart content -->
+    <div class="flex flex-col items-center justify-center h-full text-center px-4">
+      <p class="text-lg font-medium">Your cart is empty</p>
+      <p class="text-sm text-gray-600 mt-2">Have an account? Log in to check out faster.</p>
+      <a href="/collections/all" class="mt-4 inline-block px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800">
+        Continue shopping
+      </a>
+    </div>
+  </div>
+</div>
+
+<section class="px-6 py-12">
+  <div>
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-2xl font-semibold">{{ section.settings.title }}</h2>
+
+      {% assign collection_handle = section.settings.featured_collection | default: 'all' %}
+      <a href="{{ collections[collection_handle].url }}" class="text-sm text-gray-600 hover:underline">View all</a>
+    </div>
+
+    {% assign featured_collection = collections[collection_handle] %}
+
+    {% if featured_collection and featured_collection.products_count > 0 %}
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {% for product in featured_collection.products limit: 4 %}
+          {% render 'product-card', product: product %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No products found.</p>
+    {% endif %}
+  </div>
+</section>
+
+
+
+<!-- JS for drawer -->
+<script>
+  function openCart() {
+    document.getElementById('cartDrawer').classList.remove('hidden');
+    setTimeout(() => {
+      document.getElementById('cartPanel').classList.remove('translate-x-full');
+    }, 10);
+  }
+
+  function closeCart() {
+    document.getElementById('cartPanel').classList.add('translate-x-full');
+    setTimeout(() => {
+      document.getElementById('cartDrawer').classList.add('hidden');
+    }, 300);
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Featured + Hero",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Hero image"
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Hero heading",
+      "default": "New arrivals"
+    },
+    {
+      "type": "text",
+      "id": "hero_button_label",
+      "label": "Button label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "hero_button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "default": "Featured collection",
+      "label": "Title"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Collection"
+    }
+  ]
+}
+
+{% endschema %}

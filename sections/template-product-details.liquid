@@ -1,0 +1,178 @@
+
+
+  <div  class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-10">
+  
+  <!-- Left Column: Product Images -->
+  <div class="grid grid-cols-2 gap-4">
+    <img src="https://picsum.photos/800/1000?random=1" alt="Product Image"
+      class="w-full h-[500px] object-cover rounded-lg">
+    <img src="https://picsum.photos/800/1000?random=2" alt="Product Image"
+      class="w-full h-[500px] object-cover rounded-lg">
+    <img src="https://picsum.photos/800/1000?random=3" alt="Product Image"
+      class="w-full h-[500px] object-cover rounded-lg">
+    <img src="https://picsum.photos/800/1000?random=4" alt="Product Image"
+      class="w-full h-[500px] object-cover rounded-lg">
+    <img src="https://picsum.photos/800/1000?random=5" alt="Product Image"
+      class="w-full h-[500px] object-cover rounded-lg">
+    <img src="https://picsum.photos/800/1000?random=6" alt="Product Image"
+      class="w-full h-[500px] object-cover rounded-lg">
+  </div>
+
+  <!-- Right Column: Product Info (Sticky) -->
+  <div class="self-start sticky top-10">
+    <h1 class="text-2xl font-semibold mb-2">Jahmad Long Sleeve Polo</h1>
+    <p class="text-lg text-gray-800 mb-8 mt-8 pb-8 border-b border-gray-100">$211.00</p>
+
+    <!-- Colors -->
+    <div class="mb-6">
+      <p class="mb-2 font-medium">Color <span class="text-gray-600">Black</span></p>
+      <div class="flex gap-3">
+        <button class="w-10 h-10 rounded-full border border-gray-400 bg-[#C4C18B]"></button>
+        <button class="w-10 h-10 rounded-full border-2 border-black bg-black"></button>
+        <button class="w-10 h-10 rounded-full border border-gray-400 bg-gray-200"></button>
+        <button class="w-10 h-10 rounded-full border border-gray-400 bg-white"></button>
+      </div>
+    </div>
+
+    <!-- Sizes -->
+    <div class="mb-6 w-full">
+      <p class="mb-2 font-medium">Size</p>
+      <div id="sizeButtons" class="flex w-full gap-2">
+        <button class="flex-1 px-4 py-2 border rounded-md bg-black text-white">XS</button>
+        <button class="flex-1 px-4 py-2 border rounded-md">S</button>
+        <button class="flex-1 px-4 py-2 border rounded-md">M</button>
+        <button class="flex-1 px-4 py-2 border rounded-md">L</button>
+        <button class="flex-1 px-4 py-2 border rounded-md">XL</button>
+        <button class="flex-1 px-4 py-2 border rounded-md">XXL</button>
+      </div>
+    </div>
+
+   <!-- Quantity & Add to Cart -->
+<div class="flex items-center gap-3 mb-6" 
+     x-data="{ qty: 1 }">
+
+  <!-- Quantity Selector -->
+  <div class="flex items-center border rounded-md">
+    <button @click="if(qty>1) qty--" class="px-3 py-2">-</button>
+    <span class="px-4" x-text="qty"></span>
+    <button @click="qty++" class="px-3 py-2">+</button>
+  </div>
+
+  <!-- Add to Cart -->
+  <button @click="addToCart(qty)"
+          class="flex-1 bg-black text-white py-3 rounded-md flex items-center justify-center gap-2 cursor-pointer">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.6 8H19M7 13L5.4 5M10 21a1 1 0 11-2 
+        0 1 1 0 012 0zm10 0a1 1 0 11-2 0 1 1 0 012 0z" />
+    </svg>
+    Add to cart
+  </button>
+</div>
+
+    <!-- Buy with ShopPay -->
+    <button class="w-full bg-[#5a31f4] text-white py-3 rounded-md mb-4">
+      Buy with ShopPay
+    </button>
+    <a href="#" class="block text-center text-sm text-gray-600 underline mb-6">More payment options</a>
+
+    <!-- Description -->
+    <p class="italic text-sm text-gray-600 mb-4">
+      This is a demonstration store. You can purchase products like this from <a href="#"
+        class="underline">Saturdays NYC</a>.
+    </p>
+    <p class="text-gray-700">
+      The Jahmad short sleeve Knit Polo is fabricated in a light cotton-linen blend and features pointelle
+      striped details at the front body with a polo-style collar and button closure.
+    </p>
+  </div>
+</div>
+
+
+  
+  <!-- You may also like Section -->
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    <h2 class="text-lg font-semibold mb-6">You may also like</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
+      <!-- Product 1 -->
+      <div class="text-center">
+        <img src="https://picsum.photos/300/400?random=10" alt="Product 1" class="w-full h-[250px] object-cover rounded-md mb-2">
+        <p class="text-sm font-medium">New York Brand Shirt</p>
+        <p class="text-gray-600 text-sm">$120.00</p>
+      </div>
+      <!-- Product 2 -->
+      <div class="text-center">
+        <img src="https://picsum.photos/300/400?random=11" alt="Product 2" class="w-full h-[250px] object-cover rounded-md mb-2">
+        <p class="text-sm font-medium">Classic White Tee</p>
+        <p class="text-gray-600 text-sm">$89.00</p>
+      </div>
+      <!-- Product 3 -->
+      <div class="text-center">
+        <img src="https://picsum.photos/300/400?random=12" alt="Product 3" class="w-full h-[250px] object-cover rounded-md mb-2">
+        <p class="text-sm font-medium">Denim Jacket</p>
+        <p class="text-gray-600 text-sm">$150.00</p>
+      </div>
+      <!-- Product 4 -->
+      <div class="text-center">
+        <img src="https://picsum.photos/300/400?random=13" alt="Product 4" class="w-full h-[250px] object-cover rounded-md mb-2">
+        <p class="text-sm font-medium">Casual Hoodie</p>
+        <p class="text-gray-600 text-sm">$99.00</p>
+      </div>
+    </div>
+  </div>
+
+ 
+
+  <!-- Slideshow Script -->
+  <script>
+    function addToCart(qty) {
+    fetch('/cart/add.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: {{ product.selected_or_first_available_variant.id }},
+        quantity: qty
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log('Added to cart:', data);
+      // Redirect to cart OR show confirmation
+      window.location.href = '/cart';
+    })
+    .catch(err => console.error('Error adding to cart:', err));
+  }
+
+     const sizeButtons = document.querySelectorAll("#sizeButtons button");
+
+  sizeButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      // Reset all buttons
+      sizeButtons.forEach(btn => {
+        btn.classList.remove("bg-black", "text-white");
+      });
+      // Highlight clicked button
+      button.classList.add("bg-black", "text-white");
+    });
+  });
+
+    const decreaseBtn = document.getElementById("decreaseQty");
+  const increaseBtn = document.getElementById("increaseQty");
+  const quantityEl = document.getElementById("quantity");
+
+  let quantity = 1;
+
+  increaseBtn.addEventListener("click", () => {
+    quantity++;
+    quantityEl.textContent = quantity;
+  });
+
+  decreaseBtn.addEventListener("click", () => {
+    if (quantity > 1) {
+      quantity--;
+      quantityEl.textContent = quantity;
+    }
+  });
+  </script>
+

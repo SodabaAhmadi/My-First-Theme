@@ -1,0 +1,28 @@
+{%- doc -%}
+  Cart Drawer wrapper with overlay + sliding panel.
+{%- enddoc -%}
+
+<script src="{{ 'cart.js' | asset_url }}" type="module"></script>
+
+<div id="cartDrawer" class="fixed inset-0 hidden z-50">
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeCart()"></div>
+
+  <!-- Drawer Panel -->
+  <div id="cartPanel"
+       class="absolute right-0 top-0 h-full w-80 bg-white shadow-lg transform translate-x-full transition-transform duration-300 flex flex-col">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b">
+      <h2 class="text-lg font-semibold">{{ 'content.cart_title' | t }}</h2>
+      <button onclick="closeCart()" class="text-gray-600 hover:text-black">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 flex flex-col">
+      {% render 'cart-drawer-content', section_id: section.id %}
+    </div>
+  </div>
+</div>

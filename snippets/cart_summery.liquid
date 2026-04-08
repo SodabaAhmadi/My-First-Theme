@@ -1,0 +1,29 @@
+{%- doc -%}
+  Cart summary with subtotal, discounts, and checkout button.
+{%- enddoc -%}
+
+<div class="space-y-4">
+  <!-- Subtotal -->
+  <div class="flex justify-between text-sm">
+    <span>{{ 'content.cart_subtotal' | t }}</span>
+    <span>{{ cart.total_price | money }}</span>
+  </div>
+
+  <!-- Discounts -->
+  {% if settings.show_add_discount_code %}
+    {% render 'cart-discount', section_id: section_id %}
+  {% endif %}
+
+  <!-- Note -->
+  {% if settings.show_cart_note %}
+    {% render 'cart-note' %}
+  {% endif %}
+
+  <!-- Checkout -->
+  <form action="/cart" method="post" class="space-y-3">
+    <button type="submit" name="checkout"
+            class="w-full bg-black text-white py-2 rounded-md hover:bg-gray-800">
+      {{ 'content.checkout' | t }}
+    </button>
+  </form>
+</div>
